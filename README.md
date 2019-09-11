@@ -11,6 +11,8 @@ domain, subdomain, entities, relationships between entities, dates, and task-spe
 
 Paper link: [pre-print](https://einstein.ai/presentations/ctrl.pdf)
 
+Blog link: https://blog.einstein.ai/introducing-a-conditional-transformer-language-model-for-controllable-generation/
+
 The code currently supports two functionalities:
 1. Generating from a trained model, two models are available for download - one with a sequence length of 256 and another with a sequence length of 512 -- they are trained with word-level vocabularies and through a sliding window approach can generate well beyond their trained sequence lengths. 
 2. Source attribution - given a prompt, prints the perplexity of the prompt conditional on each domain control code (see Section 5 of the paper). 
