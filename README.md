@@ -15,6 +15,7 @@ The code currently supports two functionalities:
 1. Generating from a trained model, two models are available for download - one with a sequence length of 256 and another with a sequence length of 512 -- they are trained with word-level vocabularies and through a sliding window approach can generate well beyond their trained sequence lengths. 
 2. Source attribution - given a prompt, prints the perplexity of the prompt conditional on each domain control code (see Section 5 of the paper). 
 
+Please refer to the argument flags for more details regarding the options available for either. 
 
 ## Table of Contents
 
@@ -125,6 +126,22 @@ The scientists were able to track down the unicorn population by analyzing their
 
  “It would give us a much clearer picture about what makes the creature unique.”- Dr David Sillito, lead researcher ...
  ```
+
+As a generate note, you don't have to use greedy sampling. You can switch to `topk` or `nucleus` through the appropriate argument flags. 
+
+Running it with `--temperature 0.2` and `--topk 5` yields:
+
+```
+Links In a shocking finding, scientist discovered a herd of unicorns living in a remote, previously unexplored valley, in the Andes Mountains. Even more surprising to the researchers was the fact that the unicorns spoke perfect English.
+
+ The scientists were able to track down and capture one of these unicorn herds as it roamed through the valley for several days. They then took DNA samples from each animal and compared them with other animals found throughout the region.
+
+ Advertisement
+
+ What they found is truly astounding.
+
+ According to the scientists, there are approximately 50 different species of unicorn, all of which live on two continents — North America and South America...
+```
 
 
 2. Wikipedia 
