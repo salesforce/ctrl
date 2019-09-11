@@ -22,7 +22,7 @@ Please refer to the argument flags for more details regarding the options availa
 ## Table of Contents
 
 1. [Citation](#citation)
-2. [License & Code of Conduct](#license-and-code-of-conduct)
+2. [License](#license)
 3. [Questions for Deliberation](#questions-for-deliberation)
 4. [Usage](#usage)
 5. [Sample Generations](#generations)
