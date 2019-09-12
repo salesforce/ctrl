@@ -220,7 +220,7 @@ while True:
           # if you are using nucleus prob, then compute the nucleus probability size
           if nucleusprob > 0.:
             minimum_topk = 1
-            nucleus = max(np.where(np.cumsum(np.sort(prompt_probs)[::-1])>nucleusprob)[0][0], MINIMUM_NUMBER_OF_TOPK)
+            nucleus = max(np.where(np.cumsum(np.sort(prompt_probs)[::-1])>nucleusprob)[0][0], minimum_topk)
           elif topk > 0:
             # we are over-loading notation here
             # if you choose to specify a topk instead of a nucleus,
