@@ -14,6 +14,9 @@ from tensorflow.python import debug as tf_debug
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import embedding_ops
 import fastBPE
+import platform
+
+use_py3 = platform.python_version()[0] == '3'
 
 parser = argparse.ArgumentParser(description='TensorFlow code for generating from CTRL')
 parser.add_argument('--model_dir', type=str, required=True,
@@ -27,7 +30,7 @@ os.environ['PYTHONHASHSEED'] = str(args.seed)
 np.random.seed(args.seed)
 
 # load the vocabulary from file
-vocab = open('vocab').read().decode(encoding='utf-8').split('\n')
+vocab = open('vocab').read().decode(encoding='utf-8').split('\n') if not use_py3 else open('vocab', encoding='utf-8').read().split('\n')
 vocab = list(map(lambda x: x.split(' ')[0], vocab)) + ['<unk>'] + ['\n']
 print ('{} unique words'.format(len(vocab)))
 
@@ -150,7 +153,7 @@ with open('control_codes.txt', 'r') as f:
 
     
 while True:
-    _prompt = raw_input('ENTER PROMPT: ')
+    _prompt = raw_input('ENTER PROMPT: ') if not use_py3 else input('ENTER PROMPT: ')
 
     ppls = {}
     # loop over all domains and compute perplexity
