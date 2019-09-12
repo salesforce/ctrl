@@ -93,7 +93,7 @@ We highly recommend experimenting within a virtualenv or Docker image since the 
 
 3. Get the model files from `gs://sf-ctrl/seqlen256_v1.ckpt/` or `gs://sf-ctrl/seqlen512_v1.ckpt/`.
 
-The model architecture is identical for both checkpoints. The former is trained with lower training sequence length (256) while the latter is trained with a larger one (512). We plan to update the models (with the appropriate version tags) as we continue to train them longer and on more data. Our current recommendation is to use the `256_v1` model unless you have a strong reason not to. 
+The model architecture is identical for both checkpoints. The former is trained with lower training sequence length (256) while the latter is trained with a larger one (512). We plan to update the models (with the appropriate version tags) as we continue to train them longer and on more data. **Our current recommendation is to use the `256_v1` model unless you have a strong reason not to. If you have no preference for domain, `Links` is always a good first choice.**
 
 [With `gsutil` installed](https://cloud.google.com/storage/docs/gsutil_install), you can simply run `gsutil -m cp -r gs://sf-ctrl/seqlen256_v1.ckpt/ .` for copying the model checkpoint over. 
 
