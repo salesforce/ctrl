@@ -97,6 +97,8 @@ The model architecture is identical for both checkpoints. The former is trained 
 
 [With `gsutil` installed](https://cloud.google.com/storage/docs/gsutil_install), you can simply run `gsutil -m cp -r gs://sf-ctrl/seqlen256_v1.ckpt/ .` for copying the model checkpoint over. 
 
+Without `gsutil`, you can follow the route recommended @ https://github.com/salesforce/ctrl/issues/7#issuecomment-531303214
+
 4. Run the generation script `generation.py` or the source attribution script `source_attribution.py`. 
 
 The `generation.py` prompts the user to input text and then prints the continuation. 
