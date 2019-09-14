@@ -15,6 +15,11 @@ from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import embedding_ops
 import fastBPE
 
+try:
+  raw_input
+except NameError:
+  raw_input = input
+
 parser = argparse.ArgumentParser(description='TensorFlow code for generating from CTRL')
 parser.add_argument('--model_dir', type=str, required=True,
                                         help='location of model checkpoint')
