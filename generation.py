@@ -14,6 +14,9 @@ from tensorflow.python import debug as tf_debug
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import embedding_ops
 import fastBPE
+import platform
+
+use_py3 = platform.python_version()[0] == '3'
 
 parser = argparse.ArgumentParser(description='TensorFlow code for generating from CTRL')
 parser.add_argument('--model_dir', type=str, required=True,
@@ -37,7 +40,7 @@ os.environ['PYTHONHASHSEED'] = str(args.seed)
 np.random.seed(args.seed)
 
 # load the vocabulary from file
-vocab = open('vocab').read().decode(encoding='utf-8').split('\n')
+vocab = open('vocab').read().decode(encoding='utf-8').split('\n') if not use_py3 else open('vocab', encoding='utf-8').read().split('\n')
 vocab = list(map(lambda x: x.split(' ')[0], vocab)) + ['<unk>'] + ['\n']
 print ('{} unique words'.format(len(vocab)))
 
@@ -159,7 +162,7 @@ penalty = args.penalty
 topk = args.topk
 
 while True:
-    prompt = raw_input('ENTER PROMPT: ')
+    prompt = raw_input('ENTER PROMPT: ') if not use_py3 else input('ENTER PROMPT: ')
 
     # tokenize provided prompt
     split_prompt = bpe.apply([prompt])[0].split()
