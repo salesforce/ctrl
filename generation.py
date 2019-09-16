@@ -148,7 +148,7 @@ estimator_model = tf.keras.estimator.model_to_estimator(keras_model=model, confi
 # we now create a serving function from this estimator
 # this enables us to load the model once and easily query it multiple times
 def serving_input_fn():
-    inputs = {'input_1': tf.placeholder(tf.int32, [2,seq_length])}
+    inputs = {'input_1': tf.placeholder(tf.int32, [1,seq_length])}
     return tf.estimator.export.ServingInputReceiver(inputs, inputs)
 predict_fn = tf.contrib.predictor.from_estimator(estimator_model, serving_input_fn)
 
@@ -170,7 +170,7 @@ while True:
 
     # pad with 0s and create a mini-batch of 2 (arbitrary, for ease of code)
     padded_text = text + [0] * (args.generate_num - len(text))
-    tokens_generated = np.tile(padded_text, (2,1))
+    tokens_generated = np.tile(padded_text, (1,1))
     try:
         for token in range(len(text)-1, args.generate_num-1):
           # get the logits from the prediction function
@@ -185,7 +185,6 @@ while True:
             end = token + 1
             start = token - seq_length + 2
             prompt_logits = predict_fn({'input_1':np.hstack((tokens_generated[:,0:1], tokens_generated[:,start:end]))})['tied_embedding_softmax'].squeeze() / (temperature if temperature>0 else 1.)
-
 
 
           # if penalty (for repetition) is non-zero,
@@ -205,19 +204,19 @@ while True:
                  if generated_token in penalized_so_far:
                      continue
                  penalized_so_far.add(generated_token)
-                 prompt_logits[0][_token][generated_token] /= penalty
+                 prompt_logits[_token][generated_token] /= penalty
 
           # disallow some tokens
-          prompt_logits[0][_token][word2idx['<unk>']] = -1e8
+          prompt_logits[_token][word2idx['<unk>']] = -1e8
 
           # sometimes, when generating from reddit,
           # it tries to generate the Score (reddit Karma) immediately after generating the Title:
           # to disallow this, we can just prevent it from generating Score
-          prompt_logits[0][_token][word2idx['Sco@@']] = -1e8
+          prompt_logits[_token][word2idx['Sco@@']] = -1e8
 
 
           # compute probabilities from logits
-          prompt_probs = np.exp(prompt_logits[0][_token])
+          prompt_probs = np.exp(prompt_logits[_token])
           prompt_probs = prompt_probs / sum(prompt_probs)
           pruned_list = np.argsort(prompt_probs)[::-1]
           # if you are using nucleus prob, then compute the nucleus probability size
