@@ -9,7 +9,7 @@ users cannot easily control this generation process. We release *CTRL*, a 1.6 bi
 transformer language model, trained to condition on control codes that specify
 domain, subdomain, entities, relationships between entities, dates, and task-specific behavior. Control codes were derived from structure that naturally co-occurs with raw text, preserving the advantages of unsupervised learning while providing more explicit control over text generation.
 
-Paper link: [pre-print](https://einstein.ai/presentations/ctrl.pdf)
+Paper link: https://arxiv.org/abs/1909.05858
 
 Blog link: https://blog.einstein.ai/introducing-a-conditional-transformer-language-model-for-controllable-generation/
 
@@ -36,7 +36,7 @@ Please refer to the argument flags for more details regarding the options availa
 @article{keskarCTRL2019,
   title={{CTRL - A Conditional Transformer Language Model for Controllable Generation}},
   author={Keskar, Nitish Shirish and McCann, Bryan and Varshney, Lav and Xiong, Caiming and Socher, Richard},
-  journal={arXiv preprint arXiv:1909},
+  journal={arXiv preprint arXiv:1909.05858},
   year={2019}
 }
 ```
