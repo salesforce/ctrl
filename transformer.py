@@ -19,15 +19,15 @@ def positional_encoding(position, d_model_size):
 
 def scaled_dot_product_attention(q, k, v, mask):
   # calculate attention
-  matmul_qk = tf.matmul(q, k, transpose_b=True)
+  matmul_qk = tf.cast(tf.matmul(q, k, transpose_b=True), tf.float32)
   
   dk = tf.cast(tf.shape(k)[-1], tf.float32)
   scaled_attention_logits = matmul_qk / tf.math.sqrt(dk)
 
   if mask is not None:
-    scaled_attention_logits += (mask * -1e9)
+    scaled_attention_logits += (mask * -1e3)
     
-  attention_weights = tf.nn.softmax(scaled_attention_logits, axis=-1) 
+  attention_weights = tf.cast(tf.nn.softmax(scaled_attention_logits, axis=-1), tf.float16)
   output = tf.matmul(attention_weights, v) 
   return output
 
@@ -85,14 +85,16 @@ class EncoderLayer(tf.keras.layers.Layer):
     
     self.dropout1 = tf.keras.layers.Dropout(rate)
     self.dropout2 = tf.keras.layers.Dropout(rate)
+    self.to32 = lambda x: tf.cast(x, tf.float32)
+    self.to16 = lambda x: tf.cast(x, tf.float16)
     
   def call(self, x, training, mask):
-    normed = self.layernorm1(x)
+    normed = self.to16(self.layernorm1(self.to32(x)))
     attn_output  = self.multi_head_attention(normed, normed, normed, mask)
     attn_output = self.dropout1(attn_output, training=training)
     out1 = x + attn_output
-
-    out2 = self.layernorm2(out1)
+    
+    out2 = self.to16(self.layernorm2(self.to32(out1)))
     ffn_output = self.ffn(out2)
     ffn_output = self.dropout2(ffn_output, training=training)
     out2 = out1 + ffn_output
@@ -123,7 +125,6 @@ class Encoder(tf.keras.layers.Layer):
     return base_config
   
   def call(self, x, training):
-
     seq_len = tf.shape(x)[1]
     
     mask = 1 - tf.linalg.band_part(tf.ones((seq_len, seq_len)), -1, 0)
@@ -132,8 +133,9 @@ class Encoder(tf.keras.layers.Layer):
     x += self.pos_encoding[:, :seq_len, :]
 
     x = self.dropout(x, training=training)
+    x = tf.cast(x, tf.float16)
     
     for i in range(self.num_layers):
       x = getattr(self, "layer%i" % i)(x, training, mask)
-    return self.layernorm(x)
+    return self.layernorm(tf.cast(x, tf.float32))
 

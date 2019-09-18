@@ -13,14 +13,15 @@ from collections import Counter
 from tensorflow.python import debug as tf_debug
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import embedding_ops
+from tensorflow.python import pywrap_tensorflow
 import fastBPE
 import platform
 
 use_py3 = platform.python_version()[0] == '3'
 
 parser = argparse.ArgumentParser(description='TensorFlow code for generating from CTRL')
-parser.add_argument('--model_dir', type=str, required=True,
-                                        help='location of model checkpoint')
+parser.add_argument('--model_path', type=str, required=True,
+                                        help='location of model *data* checkpoint; this is NOT the directory but rather the model checkpoint')
 parser.add_argument('--seed', type=int, default=1337,
                                         help='random seed for TensorFlow, numpy and PythonHash')
 parser.add_argument('--generate_num', type=int, default=256,
@@ -75,10 +76,10 @@ class TiedEmbeddingSoftmax(tf.keras.layers.Layer):
 
   def __init__(self, vocab_size=vocab_size, embedding_size=embedding_dim, **kwargs):
     super(TiedEmbeddingSoftmax, self).__init__()
-    self.w = self.add_weight(name='w', shape=(vocab_size, embedding_size),
+    self.w = self.add_weight(name='w', shape=(vocab_size, embedding_size), dtype=tf.float32, 
                              initializer='random_normal',
                              trainable=True)
-    self.b = self.add_weight(name='b', shape=(vocab_size,),
+    self.b = self.add_weight(name='b', shape=(vocab_size,), dtype=tf.float32, 
                              initializer='zeros',
                              trainable=True)
 
@@ -132,26 +133,6 @@ model.compile(optimizer=optimizer, loss=loss)
 print(model.summary())
 
 
-# IMPORTANT
-# this is where the saved model is presented to the code
-# the model directory should have the model checkpoint and
-# a checkpoint file
-run_config = tf.contrib.tpu.RunConfig(
-        model_dir=args.model_dir)
-
-
-# this converts the Keras model to a TensorFlow estimator
-# this step is critical
-# remember to patch the TF 1.14 file before running the code, else you're going to see errors here
-estimator_model = tf.keras.estimator.model_to_estimator(keras_model=model, config=run_config)
-
-# we now create a serving function from this estimator
-# this enables us to load the model once and easily query it multiple times
-def serving_input_fn():
-    inputs = {'input_1': tf.placeholder(tf.int32, [1,seq_length])}
-    return tf.estimator.export.ServingInputReceiver(inputs, inputs)
-predict_fn = tf.contrib.predictor.from_estimator(estimator_model, serving_input_fn)
-
 # almost there, we now take the user prompt and tokenize with BPE
 # load BPE codes
 bpe = fastBPE.fastBPE('codes', 'vocab')
@@ -161,7 +142,29 @@ nucleusprob = args.nucleus
 penalty = args.penalty
 topk = args.topk
 
+# Load the model file
+chkpt_for_reader = '.'.join(args.model_path.split('.')[:-1])
+reader = pywrap_tensorflow.NewCheckpointReader(chkpt_for_reader)
+
+# assign weights from the checkpoint to the Keras model
+# this is super hacky but I couldn't find a better way to do this
+# PR is highly welcome if you know of a better way
+
+# embedding and softmax
+# these are fp32
+model.layers[1].trainable_variables[0].assign(tf.cast(reader.get_tensor('w'), tf.float32))
+model.layers[1].trainable_variables[1].assign(tf.cast(reader.get_tensor('b'), tf.float32))
+
+# encoder weights
+for _ in range(len(model.layers[2].trainable_weights)):
+    tensor = model.layers[2].trainable_weights[_]
+    if 'normalization' in tensor.name[:-2]: # layernorm is fp32
+      tensor.assign(tf.cast(reader.get_tensor(tensor.name[:-2]), tf.float32))
+    else: # everything else is fp16
+      tensor.assign(tf.cast(reader.get_tensor(tensor.name[:-2]), tf.float16))
+
 while True:
+    print('WARNING! THIS VERSION OF THE CODE ALLOWS FOR LOWER MEMORY USAGE THROUGH FP16 QUANTIZATION BUT IS UNTESTED; GENERATIONS MAY BE WORSE. USE AT YOUR OWN RISK. ')
     prompt = raw_input('ENTER PROMPT: ') if not use_py3 else input('ENTER PROMPT: ')
 
     # tokenize provided prompt
@@ -178,13 +181,13 @@ while True:
           # this is done by sliding the window over (past 512 tokens) and continuing prediction
           # I'm sure this can be simplified (TODO)
           if token <= seq_length:
-            prompt_logits = predict_fn({'input_1':tokens_generated[:, :seq_length]})['tied_embedding_softmax'].squeeze() / (temperature if temperature>0 else 1.)
+            prompt_logits = model.predict_on_batch(tokens_generated[:, :seq_length]).squeeze() / (temperature if temperature>0 else 1.)
             _token = token if token < seq_length else -1
           else:
             _token = -1
             end = token + 1
             start = token - seq_length + 2
-            prompt_logits = predict_fn({'input_1':np.hstack((tokens_generated[:,0:1], tokens_generated[:,start:end]))})['tied_embedding_softmax'].squeeze() / (temperature if temperature>0 else 1.)
+            prompt_logits = model.predict_on_batch(np.hstack((tokens_generated[:,0:1], tokens_generated[:,start:end]))).squeeze() / (temperature if temperature>0 else 1.)
 
 
           # if penalty (for repetition) is non-zero,
