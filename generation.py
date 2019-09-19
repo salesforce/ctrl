@@ -33,6 +33,8 @@ parser.add_argument('--topk', type=int, default=0,
                                         help='topk value for sampling from the softmax distribution ; 0 means no topk preferred')
 parser.add_argument('--penalty', type=float, default=1.2,
                                         help='repetition penalty for greedy sampling')
+parser.add_argument('--print_once', action='store_true',
+                                        help='the completion is printed only at the end; not every word')
 
 args = parser.parse_args()
 tf.random.set_random_seed(args.seed)
@@ -271,9 +273,14 @@ while True:
           tokens_generated_so_far = ' '.join([idx2word[c] for c in tokens_generated[0].squeeze()[:token+2]])
           tokens_generated_so_far = re.sub('(@@ )', '', string=tokens_generated_so_far)
           tokens_generated_so_far = re.sub('(@@ ?$)', '', string=tokens_generated_so_far)              
-          print(tokens_generated_so_far)
-          print()
 
+          if not args.print_once:
+            print('---------------------------------------')
+            print(tokens_generated_so_far)
+            print()
+        print('---------------------------------------')            
+        print(tokens_generated_so_far)
+        print()
 
     except KeyboardInterrupt: #Exception as e:
         print('Continuing')
