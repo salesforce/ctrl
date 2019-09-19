@@ -1,6 +1,16 @@
 # CTRL - A Conditional Transformer Language Model for Controllable Generation
 Authors: [Nitish Shirish Keskar](http://keskarnitish.github.io), [Bryan McCann](https://bmccann.github.io/), [Lav Varshney](http://www.varshney.csl.illinois.edu/), [Caiming Xiong](http://www.stat.ucla.edu/~caiming/), and [Richard Socher](https://www.socher.org/)
 
+## Updates
+
+Sep 19, 2019
+
+You should now be able to run inference on K80/T4/P100/similar GPUs using the `lower_memory` branch. We quantized certain weights to `fp16` which reduced memory usage. Simply clone the repo and `git checkout lower_memory`. Here is a collaboratory link that demonstrates this functionality: https://colab.research.google.com/drive/1hVveBQShDru1Mjnhe4C21uQv4A2eH1tV
+
+This functionality is being tested, please file GitHub issues if you see something aberrent. We still recommend using the full model if possible. Once the functionality has been sufficiently tested, we will update the repo and merge into `master`. 
+
+Two quick notes: (1) Unlike the base version, here, the `model_path` requires the path to the `.data` file and not just the ckpt folder (see collaboratory for example), (2) the first generation is slow because of overhead in setting up the model but the subsequent ones should be fast.
+
 ## Introduction
 
 
@@ -89,6 +99,8 @@ TensorFlow can be installed via `pip install tensorflow[-gpu]==1.14`. fastBPE in
 ```patch -b <path_to_tensorflow_estimator_package>/python/estimator/keras.py estimator.patch```
 
 We highly recommend experimenting within a virtualenv or Docker image since the workflow involves patching a TensorFlow file to support some custom functionality. This step is not optional; skipping this step will cause errors (irrespective of device).
+
+If you run into OOM issues because of GPU memory exhaustion, please use the `lower_memory` branch. See the (Sep 19, 2019) update at the top of this README for details. 
 
 
 3. Get the model files from `gs://sf-ctrl/seqlen256_v1.ckpt/` or `gs://sf-ctrl/seqlen512_v1.ckpt/`.
