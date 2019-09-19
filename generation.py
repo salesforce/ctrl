@@ -237,6 +237,8 @@ while True:
             # then we will use the whole list
             nucleus = len(pruned_list)
             
+          pruned_list = pruned_list[:nucleus]
+          
           # if you want to disallow more complex tokens, you can do so here
           # for instance, if you want to disallow anything with the phrase `http`,
           # you can delete theme from the pruned_list
@@ -254,7 +256,7 @@ while True:
           else:
             # else,
             # sample from the pruned_list with the logits
-            chosen_idx = int(tf.random.categorical(np.expand_dims(prompt_logits[0][_token][pruned_list],0), num_samples=1).numpy())
+            chosen_idx = int(tf.random.categorical(np.expand_dims(prompt_logits[_token][pruned_list],0), num_samples=1).numpy())
             idx = pruned_list[chosen_idx]
 
 
