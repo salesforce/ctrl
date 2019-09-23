@@ -2,6 +2,10 @@
 Authors: [Nitish Shirish Keskar](http://keskarnitish.github.io), [Bryan McCann](https://bmccann.github.io/), [Lav Varshney](http://www.varshney.csl.illinois.edu/), [Caiming Xiong](http://www.stat.ucla.edu/~caiming/), and [Richard Socher](https://www.socher.org/)
 
 ## Updates
+Sep 23, 2019
+
+The repo now supports (experimental) inference on PyTorch; Collaboratory: https://colab.research.google.com/drive/1nDh3ayRPJGK5ciPO2D3TFkYZFqclBWHY. Simply install PyTorch via `pip install torch` and run `python pytorch_generation.py` with the same flags as the base `generation.py` script except one exception: unlike the base version, here, the `model_path` requires the path to the `.data` file and not just the ckpt folder (see collaboratory for example).
+The code will convert the weights from TensorFlow in the first run and then create a loadable checkpoint for easier subsequent loading. You still need Tensorflow installed for the first step. 
 
 Sep 19, 2019
 
@@ -93,6 +97,8 @@ Here are the steps to get generating:
 This code relies on [TensorFlow 1.14](https://www.tensorflow.org/install) and [fastBPE](https://github.com/glample/fastBPE). 
 
 TensorFlow can be installed via `pip install tensorflow[-gpu]==1.14`. fastBPE installation instructions can be found in the GitHub repository linked above. We highly recommend experimenting within a virtualenv or Docker image. 
+
+**For inference on PyTorch, please see the update on `Sep 23` at the top of this README. If you use PyTorch, you can skip Step 2.**
 
 2. Patch the `/usr/local/lib/python2.7/dist-packages/tensorflow_estimator/python/estimator/keras.py` (or equivalent, if installed elsewhere) by running 
 
