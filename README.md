@@ -355,7 +355,8 @@ We plan to release the training code soon. We will not be releasing the training
 
 2. Is a version of the model available in PyTorch? 
 
-Not at the moment, but if we come across an equivalent implementation, we will update this section. 
+~~Not at the moment, but if we come across an equivalent implementation, we will update this section.~~
+Please refer to the update on `Sep 23` for inference on PyTorch. 
 
 3. The code errors out.
 
