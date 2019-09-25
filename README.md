@@ -1,7 +1,17 @@
 # CTRL - A Conditional Transformer Language Model for Controllable Generation
 Authors: [Nitish Shirish Keskar](http://keskarnitish.github.io), [Bryan McCann](https://bmccann.github.io/), [Lav Varshney](http://www.varshney.csl.illinois.edu/), [Caiming Xiong](http://www.stat.ucla.edu/~caiming/), and [Richard Socher](https://www.socher.org/)
 
+![](ctrl.gif)
+
 ## Updates
+
+**Sep 25, 2019**
+Two more additions:
+
+1. We add the code to fine-tune the model on a custom dataset in the `training_utils` folder. Please refer to the README within the folder for details and example usage. 
+
+2. You can get a 36-layer model from `gs://sf-ctrl/seqlen256_36layers_v0.ckpt/`; the generation of this model is markedly worse than the 48-layer (base) model but still quite coherent. 
+
 **Sep 23, 2019**
 
 The repo now supports (experimental) inference on PyTorch; Collaboratory: https://colab.research.google.com/drive/1nDh3ayRPJGK5ciPO2D3TFkYZFqclBWHY. Simply install PyTorch via `pip install torch` and run `python pytorch_generation.py` with the same flags as the base `generation.py` script except one exception: unlike the base version, here, the `model_path` requires the path to the `.data` file and not just the ckpt folder (see collaboratory for example).
@@ -110,6 +120,8 @@ If you run into OOM issues because of GPU memory exhaustion, please use the `low
 
 
 3. Get the model files from `gs://sf-ctrl/seqlen256_v1.ckpt/` or `gs://sf-ctrl/seqlen512_v1.ckpt/`.
+
+A 36-layer model is also available at `gs://sf-ctrl/seqlen256_36layers_v0.ckpt/`. 
 
 The model architecture is identical for both checkpoints. The former is trained with lower training sequence length (256) while the latter is trained with a larger one (512). We plan to update the models (with the appropriate version tags) as we continue to train them longer and on more data. **Our current recommendation is to use the `256_v1` model unless you have a strong reason not to. If you have no preference for domain, `Links` is always a good first choice.**
 
@@ -351,7 +363,10 @@ Confessions ppl = 133.619834
 
 1. Will you be releasing the training code and data?
 
-We plan to release the training code soon. We will not be releasing the training data, but we will release tips and scripts related to data collection.
+~~We plan to release the training code soon.~~
+Please refer to the update on `Sep 25` for details on training code.
+
+We will not be releasing the training data, but we will release tips and scripts related to data collection.
 
 2. Is a version of the model available in PyTorch? 
 
