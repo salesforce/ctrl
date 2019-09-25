@@ -6,6 +6,7 @@ Authors: [Nitish Shirish Keskar](http://keskarnitish.github.io), [Bryan McCann](
 ## Updates
 
 **Sep 25, 2019**
+
 Two more additions:
 
 1. We add the code to fine-tune the model on a custom dataset in the `training_utils` folder. Please refer to the README within the folder for details and example usage. 
