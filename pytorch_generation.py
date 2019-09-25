@@ -85,7 +85,7 @@ def predict_fn(inputs):
 
 bpe = fastBPE.fastBPE('codes', 'vocab')
 seq_length = min(args.generate_num, 256)
-pytorch_model_hash = hashlib.md5(args.model_path).hexdigest()
+pytorch_model_hash = hashlib.md5(args.model_path.encode('utf-8')).hexdigest()
 temperature = args.temperature
 nucleusprob = args.nucleus
 penalty = args.penalty
@@ -111,7 +111,7 @@ else:
   test_softmax.w = torch.nn.Parameter(torch.tensor(reader.get_tensor('w')).to('cuda'))
   test_softmax.b = torch.nn.Parameter(torch.tensor(reader.get_tensor('b')).to('cuda'))
 
-  list_of_variables = filter(lambda x: 'Adagrad' not in x, reader.get_variable_to_shape_map().keys())
+  list_of_variables = list(filter(lambda x: 'Adagrad' not in x, reader.get_variable_to_shape_map().keys()))
 
   str2parameter = lambda x: torch.nn.Parameter(torch.tensor(reader.get_tensor(x)).t().to('cuda'))
 
