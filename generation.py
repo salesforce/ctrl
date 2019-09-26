@@ -35,6 +35,8 @@ parser.add_argument('--penalty', type=float, default=1.2,
                                         help='repetition penalty for greedy sampling')
 parser.add_argument('--print_once', action='store_true',
                                         help='the completion is printed only at the end; not every word')
+parser.add_argument('--topn', type=int, default=0,
+                                        help='print top-n candidates during generations; defaults to 0 which is no printing')
 
 args = parser.parse_args()
 tf.random.set_random_seed(args.seed)
@@ -246,6 +248,9 @@ while True:
                   tokens_to_disallow.append(_)
           pruned_list = np.delete(pruned_list, tokens_to_disallow)
 
+          if args.topn > 0 :
+            print('TOPN :: top-n alternatives:', [idx2word[_] for _ in pruned_list[:args.topn]])
+
           # if temperature is 0
           # just pick the first (most probable) token
           if temperature==0:
@@ -256,13 +261,8 @@ while True:
             chosen_idx = int(tf.random.categorical(np.expand_dims(prompt_logits[_token][pruned_list],0), num_samples=1).numpy())
             idx = pruned_list[chosen_idx]
 
-
-          # if you want to do some debugging,
-          # like which one was chosen,
-          # what the top25 were,
-          # here is your opportunity. 
-          #print('chosen:', idx2word[idx])
-          #print('top25 alternatives:', pruned_list[:25])
+          if args.topn > 0 :
+            print('TOPN :: chosen word:', idx2word[idx])
 
           # assign the token for generation
           tokens_generated[0][token+1] = idx
