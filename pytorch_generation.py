@@ -253,7 +253,7 @@ while True:
       else:
         # else,
         # sample from the pruned_list with the logits
-        chosen_idx = torch.distributions.categorical.Categorical(torch.tensor(np.expand_dims(prompt_logits[_token][pruned_list],0))).sample().numpy()[0]
+        chosen_idx = torch.distributions.categorical.Categorical(logits=torch.tensor(np.expand_dims(prompt_logits[_token][pruned_list],0))).sample().numpy()[0]
         idx = pruned_list[chosen_idx]
 
       if args.topn > 0 :
