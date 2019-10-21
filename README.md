@@ -5,7 +5,7 @@ Authors: [Nitish Shirish Keskar](http://keskarnitish.github.io), [Bryan McCann](
 
 ## Updates
 
-** Oct 21, 2019**
+**Oct 21, 2019**
 
 CTRL is now in [Hugginface/Transformers](https://github.com/huggingface/transformers)!
 You can simply follow the installation instructions are run:
