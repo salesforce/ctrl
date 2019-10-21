@@ -7,8 +7,9 @@ Authors: [Nitish Shirish Keskar](http://keskarnitish.github.io), [Bryan McCann](
 
 **Oct 21, 2019**
 
-CTRL is now in [Hugginface/Transformers](https://github.com/huggingface/transformers)!
-You can simply follow the installation instructions are run:
+CTRL is now in [hugginface/transformers](https://github.com/huggingface/transformers)!
+
+You can simply follow the installation instructions and run:
 
 ```
 python examples/run_generation.py  --model_type ctrl --model_name ctrl --temperature 0 --repetition 1.2
