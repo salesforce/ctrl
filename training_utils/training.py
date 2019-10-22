@@ -1,12 +1,10 @@
 from __future__ import division
 from __future__ import print_function
 import sys
-
 sys.path.append('../')
 import tensorflow as tf
 import os
 import numpy as np
-
 tf.enable_eager_execution()
 import transformer
 import argparse
@@ -18,19 +16,18 @@ from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import embedding_ops
 import fastBPE
 import platform
-from tensorflow.keras.callbacks import TensorBoard, EarlyStopping
 
 use_py3 = platform.python_version()[0] == '3'
 
 parser = argparse.ArgumentParser(description='TensorFlow code for generating from CTRL')
 parser.add_argument('--model_dir', type=str, required=True,
-                    help='location of model checkpoint')
+                                        help='location of model checkpoint')
 parser.add_argument('--seed', type=int, default=1337,
-                    help='random seed for TensorFlow, numpy and PythonHash')
+                                        help='random seed for TensorFlow, numpy and PythonHash')
 parser.add_argument('--sequence_len', type=int, default=256,
-                    help='sequence len of model being fine-tuned (must match also the TFRecords)')
+                                        help='sequence len of model being fine-tuned (must match also the TFRecords)')
 parser.add_argument('--iterations', type=int, default=1000,
-                    help='random seed for TensorFlow, numpy and PythonHash')
+                                        help='random seed for TensorFlow, numpy and PythonHash')
 
 args = parser.parse_args()
 tf.random.set_random_seed(args.seed)
@@ -38,11 +35,9 @@ os.environ['PYTHONHASHSEED'] = str(args.seed)
 np.random.seed(args.seed)
 
 # load the vocabulary from file
-vocab = open('../vocab').read().decode(encoding='utf-8').split('\n') if not use_py3 else open('../vocab',
-                                                                                              encoding='utf-8').read().split(
-    '\n')
+vocab = open('../vocab').read().decode(encoding='utf-8').split('\n') if not use_py3 else open('../vocab', encoding='utf-8').read().split('\n')
 vocab = list(map(lambda x: x.split(' ')[0], vocab)) + ['<unk>'] + ['\n']
-print('{} unique words'.format(len(vocab)))
+print ('{} unique words'.format(len(vocab)))
 
 # length of the vocabulary
 vocab_size = len(vocab)
@@ -50,13 +45,14 @@ vocab_size = len(vocab)
 # define the numericalization map
 # idx2word maps the numericalized ID to the word
 # word2idx maps the word to the numericalized ID
-word2idx = {u: i for i, u in enumerate(vocab)}
+word2idx = {u:i for i, u in enumerate(vocab)}
 idx2word = np.array(vocab)
+
+
 
 # sequence length to use for the transformer
 # must match the model being fine-tuned
 seq_length = args.sequence_len
-
 
 def input_fn(params=None):
     print('READING!', params)
@@ -66,17 +62,16 @@ def input_fn(params=None):
     myfeatures = {
         'input': tf.io.FixedLenFeature([256], tf.int64),
         'output': tf.io.FixedLenFeature([256], tf.int64)
-    }
+        }
 
     def _parse_text_function(example_proto):
         blah = tf.io.parse_single_example(example_proto, myfeatures)
         return blah['input'], blah['output']
-
-    train_data = tf_data.map(_parse_text_function).batch(params['batch_size'],
-                                                         drop_remainder=True).repeat().shuffle(
-        10000)  # .prefetch(tf.contrib.data.AUTOTUNE)
-
+    
+    train_data = tf_data.map(_parse_text_function).batch(params['batch_size'], drop_remainder=True).repeat().shuffle(10000)#.prefetch(tf.contrib.data.AUTOTUNE)
+    
     return train_data
+
 
 # the dimension of the transformer
 embedding_dim = 1280
@@ -88,30 +83,28 @@ embedding_dim = 1280
 # this layer ties the softmax weights to the input embeddings
 class TiedEmbeddingSoftmax(tf.keras.layers.Layer):
 
-    def __init__(self, vocab_size=vocab_size, embedding_size=embedding_dim, **kwargs):
-        with tf.device('/cpu:0'):
-            super(TiedEmbeddingSoftmax, self).__init__()
-            self.w = self.add_weight(name='w', shape=(vocab_size, embedding_size),
-                                     initializer='random_normal',
-                                     trainable=True)
-            self.b = self.add_weight(name='b', shape=(vocab_size,),
-                                     initializer='zeros',
-                                     trainable=True)
+  def __init__(self, vocab_size=vocab_size, embedding_size=embedding_dim, **kwargs):
+    with tf.device('/cpu:0'):
+      super(TiedEmbeddingSoftmax, self).__init__()
+      self.w = self.add_weight(name='w', shape=(vocab_size, embedding_size),
+                               initializer='random_normal',
+                               trainable=True)
+      self.b = self.add_weight(name='b', shape=(vocab_size,),
+                               initializer='zeros',
+                               trainable=True)
 
-    def call(self, inputs, embed=True):
-        with tf.device('/cpu:0'):
-            if embed:
-                dtype = tf.keras.backend.dtype(inputs)
-                if dtype != 'int32' and dtype != 'int64':
-                    inputs = math_ops.cast(inputs, 'int32')
-                return embedding_ops.embedding_lookup(self.w, inputs)
-            else:
-                return tf.tensordot(inputs, tf.transpose(self.w), 1) + self.b
-
+  def call(self, inputs, embed=True):
+    with tf.device('/cpu:0'):
+      if embed:
+        dtype = tf.keras.backend.dtype(inputs)
+        if dtype != 'int32' and dtype != 'int64':
+          inputs = math_ops.cast(inputs, 'int32')
+        return embedding_ops.embedding_lookup(self.w, inputs)
+      else:
+        return tf.tensordot(inputs, tf.transpose(self.w), 1) + self.b
 
 # input for the keras model
 tokens = tf.keras.layers.Input(shape=(seq_length,), dtype='int32')
-
 
 # instantiates a tied softmax class
 tied_embedding_softmax = TiedEmbeddingSoftmax()
@@ -124,10 +117,12 @@ embedded = tied_embedding_softmax(tokens, embed=True)
 # so you have to leave them at their defaults
 transformed = transformer.Encoder()(embedded, training=False)
 
+
 # pass the activations from our tiedsoftmax class
 # this time with embed=False denoting that we are doing the softmax operation
 # and not a lookup
 logits = tied_embedding_softmax(transformed, embed=False)
+
 
 # finally, define the Keras model with inputs as tokens and outputs as the logits we just computed
 model = tf.keras.Model(inputs=tokens, outputs=logits)
@@ -137,16 +132,15 @@ model = tf.keras.Model(inputs=tokens, outputs=logits)
 def loss(labels, logits):
     return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
 
-
 # the optimizer is not used since this code only supports inference
 # however, to compile the model, we still define it
 optimizer = tf.contrib.estimator.clip_gradients_by_norm(
-    tf.train.AdagradOptimizer(learning_rate=1e-2), 0.25)
+        tf.train.AdagradOptimizer(learning_rate=1e-2), 0.25)
 
-# compile the model with the optimizer and loss
+
+# compile the model with the optimizer and loss            
 model.compile(optimizer=optimizer, loss=loss)
 print(model.summary())
-
 
 params = {"batch_size": 2}
 model.fit(input_fn(params=params), steps_per_epoch=1000, epochs=1)
