@@ -172,7 +172,7 @@ while True:
     # tokenize provided prompt
     split_prompt = bpe.apply([prompt])[0].split()
     if not any(split_prompt[0] == x for x in CONTROL_CODES.keys()):
-        print("WARNING! You are not starting your generation from a control code so you won't get results")
+        print("WARNING! You are not starting your generation from a control code so you won't get good results")
     text = [word2idx[i] for i in split_prompt]
 
     # pad with 0s and create a mini-batch of 2 (arbitrary, for ease of code)
