@@ -5,6 +5,25 @@ Authors: [Nitish Shirish Keskar](http://keskarnitish.github.io), [Bryan McCann](
 
 ## Updates
 
+**Oct 31, 2019**
+
+Adding functionality to convert a model from TF to HuggingFace/Transformers in response to [a request](https://github.com/huggingface/transformers/issues/1654). To convert the checkpoint, simply run `python -u convert_tf_to_huggingface_pytorch.py --tf <path_to_tensorflow_data_checkpoint> --pytorch <path_to_where_you_want_to_store_pytorch_checkpoint>`
+
+Then, to use this in HuggingFace:
+
+```
+# create folder and contents for HuggingFace/Transformers
+mkdir custom_ctrl_model
+cd custom_ctrl_model
+mv <path_to_pytorch_checkpoint_from_above> .
+wget -O config.json https://storage.googleapis.com/sf-ctrl/pytorch/ctrl-config.json
+wget -O merges.txt https://raw.githubusercontent.com/salesforce/ctrl/master/ctrl-merges.txt
+wget -O vocab.json https://raw.githubusercontent.com/salesforce/ctrl/master/ctrl-vocab.json
+
+# run
+python examples/run_generation.py  --model_type ctrl --model_name <path_to_custom_ctrl_model>/ --temperature 0 --repetition 1.2
+```
+
 **Oct 21, 2019**
 
 CTRL is now in [hugginface/transformers](https://github.com/huggingface/transformers)!
