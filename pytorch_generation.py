@@ -161,9 +161,12 @@ test_encoder.eval()
 
 while True:
   prompt = raw_input('ENTER PROMPT: ') if not use_py3 else input('ENTER PROMPT: ')
+  prompt = prompt.split('\\n') # split on newlines if provided
 
   # tokenize provided prompt
-  split_prompt = bpe.apply([prompt])[0].split()
+  split_prompt = ' \n '.join(bpe.apply(prompt))
+  split_prompt = split_prompt.split(' ')
+
   if not any(split_prompt[0] == x for x in CONTROL_CODES.keys()):
     print("WARNING! You are not starting your generation from a control code so you won't get good results")
   text = [word2idx[i] for i in split_prompt]
