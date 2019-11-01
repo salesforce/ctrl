@@ -7,7 +7,7 @@ Authors: [Nitish Shirish Keskar](http://keskarnitish.github.io), [Bryan McCann](
 
 **Oct 31, 2019**
 
-Adding functionality to convert a model from TF to HuggingFace/Transformers in response to [a request](https://github.com/huggingface/transformers/issues/1654). To convert the checkpoint, simply run `python -u convert_tf_to_huggingface_pytorch.py --tf <path_to_tensorflow_data_checkpoint> --pytorch <path_to_where_you_want_to_store_pytorch_checkpoint>`
+Adding functionality to convert a model from TF to HuggingFace/Transformers in response to [a request](https://github.com/huggingface/transformers/issues/1654). To convert the checkpoint, simply install transformers via `pip install transformers` and run `python -u convert_tf_to_huggingface_pytorch.py --tf <path_to_tensorflow_data_checkpoint> --pytorch <path_to_where_you_want_to_store_pytorch_checkpoint>`
 
 Then, to use this in HuggingFace:
 
