@@ -1,0 +1,12 @@
+electronic
+animal
+sports
+food
+vehicle
+kitchen
+person
+appliance
+indoor
+furniture
+accessory
+outdoor
