@@ -70,10 +70,7 @@ with tf.io.TFRecordWriter(tfrecords_fname) as writer:
         flag_input, inputs = numericalize(domain+tokenized_train_text[i:i+seq_length])
         flag_output, outputs = numericalize(tokenized_train_text[i:i+seq_length+1])
         total += 1
-        print("\neccoci_input_output\n")
-        print(inputs)
-        print("\n")
-        print(outputs)
+
         if flag_input or flag_output:
             skipped += 1
             continue
