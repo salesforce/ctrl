@@ -159,6 +159,9 @@ run_config = tf.contrib.tpu.RunConfig(
         tpu_config=tf.contrib.tpu.TPUConfig(iterations_per_loop=100, num_cores_per_replica=1, input_partition_dims=[[1, 1], [1, 1]], per_host_input_for_training=3))
 tf.logging.set_verbosity(tf.logging.INFO)
 
+#WE SIAMO QUA AMICO
+run_config = run_config.replace(keep_checkpoint_max=2)
+
 estimator_model = tf.keras.estimator.model_to_estimator(keras_model=model, config=run_config)
 
 estimator_model.train(input_fn=input_fn, steps=args.iterations)
