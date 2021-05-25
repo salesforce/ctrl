@@ -164,7 +164,7 @@ temperature = args.temperature
 nucleusprob = args.nucleus
 penalty = args.penalty
 topk = args.topk
-prompt_used = ["Person","Person A dog","Person A man"]
+prompt_used = ["Outdoor","Outdoor a bus","Outdoor a street", "Outdoor the city", "Outdoor people", "Outdoor a man", "Outdoor car", "Outdoora church", "Outdoor stop"]
 i = 0
 while i < len(prompt_used):
     # prompt = raw_input('ENTER PROMPT: ') if not use_py3 else input('ENTER PROMPT: ')
@@ -294,7 +294,7 @@ while i < len(prompt_used):
             print("###############\n")
         print("i'm printing on a file:\n")
         print(tokens_generated_so_far + '\n')
-        f = open("new_file1.txt", "a")
+        f = open("output_model.txt", "a")
         f.write(tokens_generated_so_far + '\n')
         f.close()
         i = i+1
